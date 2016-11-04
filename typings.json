@@ -1,0 +1,19 @@
+{
+  "name": "knex-model",
+  "dependencies": {
+    "ramda": "registry:dt/ramda#0.0.0+20160824142652"
+  },
+  "globalDependencies": {
+    "knex": "registry:dt/knex#0.0.0+20160923124117",
+    "lodash": "registry:dt/lodash#4.14.0+20161004174455"
+  },
+  "globalDevDependencies": {
+    "bluebird": "registry:dt/bluebird#3.0.0+20160928162057",
+    "chai": "registry:dt/chai#3.4.0+20160601211834",
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353",
+    "node": "registry:dt/node#6.0.0+20161019125345"
+  },
+  "devDependencies": {
+    "chai-as-promised": "registry:npm/chai-as-promised#5.1.0+20160310030142"
+  }
+}
