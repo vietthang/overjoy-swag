@@ -1,6 +1,6 @@
-import { Schema } from "Swagger";
+import { Schema } from 'Swagger';
 
-export type MethodType = "get"|"post"|"put"|"delete"|"options"|"head"|"patch";
+export type MethodType = 'get'|'post'|'put'|'delete'|'options'|'head'|'patch';
 
 export interface Response {
 

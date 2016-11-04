@@ -1,11 +1,11 @@
-import { map, keys, filter, isNil, find, reduce, assoc, mapObjIndexed, chain, has } from "ramda";
-import swaggerParser = require("swagger-parser");
-import * as Swagger from "Swagger";
-import { MethodType, Response, ResponseHash, Route, ValidateParams } from "./types";
+import { map, keys, filter, isNil, find, reduce, assoc, mapObjIndexed, chain, has } from 'ramda';
+import swaggerParser = require('swagger-parser');
+import * as Swagger from 'Swagger';
+import { MethodType, Response, ResponseHash, Route, ValidateParams } from './types';
 
-const supportedMethods: MethodType[] = ["get", "post", "put", "delete", "options", "head", "patch"];
+const supportedMethods: MethodType[] = ['get', 'post', 'put', 'delete', 'options', 'head', 'patch'];
 
-const anyType: Swagger.SchemaType = ["string", "boolean", "number", "integer", "object", "array", "file"];
+const anyType: Swagger.SchemaType = ['string', 'boolean', 'number', 'integer', 'object', 'array', 'file'];
 
 function createSchema(
   parameters: Swagger.Parameter[],
@@ -15,7 +15,7 @@ function createSchema(
   const filteredParams = filter(param => param.in === type, parameters);
 
   const baseSchema: Swagger.Schema = {
-    type: "object",
+    type: 'object',
     additionalProperties,
     properties: {},
   };
@@ -27,14 +27,14 @@ function createSchema(
       filteredParams,
     );
   } else {
-    return assoc("additionalProperties", true, baseSchema);
+    return assoc('additionalProperties', true, baseSchema);
   }
 }
 
 function createPayloadValidateSchema(parameters: Swagger.Parameter[]): Swagger.Schema {
-  const bodyParameter = find(param => param.in === "body", parameters) as Swagger.BodyParameter;
+  const bodyParameter = find(param => param.in === 'body', parameters) as Swagger.BodyParameter;
   if (isNil(bodyParameter)) {
-    return createSchema(parameters, "formData", false);
+    return createSchema(parameters, 'formData', false);
   } else {
     return bodyParameter.schema;
   }
@@ -58,7 +58,7 @@ function swaggerResponseToAPIResponse(response: Swagger.Response): Response {
     headersSchema = response.headers;
   } else {
     headersSchema = {
-      type: "object",
+      type: 'object',
       additionalProperties: true,
     };
   }
@@ -75,9 +75,9 @@ function swaggerResponseToAPIResponse(response: Swagger.Response): Response {
 function operationToValidateParams(operation: Swagger.Operation): ValidateParams {
   const parameters: Swagger.Parameter[] = operation.parameters || [];
 
-  const params = createSchema(parameters, "path", false);
-  const query = createSchema(parameters, "query", false);
-  const headers = createSchema(parameters, "header", true);
+  const params = createSchema(parameters, 'path', false);
+  const query = createSchema(parameters, 'query', false);
+  const headers = createSchema(parameters, 'header', true);
   const payload = createPayloadValidateSchema(parameters);
 
   let responses: ResponseHash = {};

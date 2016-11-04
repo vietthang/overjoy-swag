@@ -1,4 +1,4 @@
-declare module "Swagger" {
+declare module 'Swagger' {
 
   export interface Info {
     title: string;
@@ -66,7 +66,7 @@ declare module "Swagger" {
     type: SchemaType;
   }
 
-  type ParameterCollectionFormat = "csv" | "ssv" | "tsv" | "pipes" | "multi";
+  type ParameterCollectionFormat = 'csv' | 'ssv' | 'tsv' | 'pipes' | 'multi';
 
   export interface FormDataParameter extends BaseParameter, BaseSchema {
     type: SchemaType;
@@ -119,7 +119,7 @@ declare module "Swagger" {
   }
 
   // ------------------------------ Schema -------------------------------------
-  type BaseSchemaType = "string"|"boolean"|"number"|"integer"|"object"|"array"|"file";
+  type BaseSchemaType = 'string'|'boolean'|'number'|'integer'|'object'|'array'|'file';
   type SchemaType = BaseSchemaType|BaseSchemaType[]
 
   interface BaseSchema {

@@ -1,6 +1,6 @@
-declare module "swagger-parser" {
+declare module 'swagger-parser' {
 
-  import { Spec as SwaggerSpec } from "Swagger";
+  import { Spec as SwaggerSpec } from 'Swagger';
 
   class SwaggerParser {
 
