@@ -83,7 +83,6 @@ declare module 'Swagger' {
 
   // ------------------------------- Path --------------------------------------
   export interface Path {
-    $ref?: string;
     get?: Operation;
     put?: Operation;
     post?: Operation;
@@ -146,7 +145,6 @@ declare module 'Swagger' {
   }
 
   export interface Schema extends BaseSchema {
-    $ref?: string;
     allOf?: [Schema];
     additionalProperties?: boolean;
     properties?: {[propertyName: string]: Schema};
