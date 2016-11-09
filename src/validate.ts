@@ -1,0 +1,41 @@
+import { Schema } from 'Swagger';
+import Ajv = require('ajv');
+import { ErrorObject } from 'ajv';
+import { memoize } from 'ramda';
+
+const ajv = new Ajv();
+
+const getValidateFunction = memoize((schema: Schema) => {
+  return ajv.compile(schema);
+});
+
+class ValidationError extends Error {
+
+  public errors: ErrorObject[];
+
+  constructor(errors: ErrorObject[]) {
+    super('Validation Error');
+    this.errors = errors;
+  }
+
+}
+
+class UnknownError extends Error {
+
+  constructor() {
+    super('Unknown Error');
+  }
+
+}
+
+export async function validate(schema: Schema, attributes: any): Promise<void> {
+  const validate = getValidateFunction(schema);
+  const result = validate(attributes);
+  if (!result) {
+    if (validate.errors) {
+      throw new ValidationError(validate.errors);
+    } else {
+      throw new UnknownError();
+    }
+  }
+}
