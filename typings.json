@@ -4,8 +4,7 @@
     "ramda": "registry:dt/ramda#0.0.0+20160824142652"
   },
   "globalDependencies": {
-    "knex": "registry:dt/knex#0.0.0+20160923124117",
-    "lodash": "registry:dt/lodash#4.14.0+20161004174455"
+    "knex": "registry:dt/knex#0.0.0+20160923124117"
   },
   "globalDevDependencies": {
     "bluebird": "registry:dt/bluebird#3.0.0+20160928162057",
