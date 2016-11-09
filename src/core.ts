@@ -1,4 +1,4 @@
-import { map, keys, filter, isNil, find, reduce, assoc, mapObjIndexed, chain, has } from 'ramda';
+import { map, keys, filter, isNil, find, reduce, assocPath, assoc, mapObjIndexed, chain, has, omit } from 'ramda';
 import swaggerParser = require('swagger-parser');
 import * as Swagger from 'Swagger';
 import { MethodType, Response, ResponseHash, Route, ValidateParams } from './types';
@@ -14,15 +14,24 @@ function createSchema(
 ): Swagger.Schema {
   const filteredParams = filter(param => param.in === type, parameters);
 
+  const requiredParams = filter(param => param.required === true, filteredParams);
+
   const baseSchema: Swagger.Schema = {
     type: 'object',
     additionalProperties,
     properties: {},
+    required: requiredParams.length ? map(param => param.name, requiredParams) : undefined,
   };
 
   if (filteredParams.length) {
     return reduce(
-      (prevValue, param) => assoc(`properties.${param.name}`, param, prevValue),
+      (prevValue, param) => {
+        return assocPath(
+          ['properties', param.name],
+          omit(['in', 'name', 'required'], param),
+          prevValue
+        );
+      },
       baseSchema,
       filteredParams,
     );

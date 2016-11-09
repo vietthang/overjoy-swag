@@ -141,11 +141,11 @@ declare module 'Swagger' {
     minProperties?: number;
     enum?: [string|boolean|number|Object];
     type?: SchemaType;
-    items?: Schema|[Schema];
+    items?: Schema|Schema[];
   }
 
   export interface Schema extends BaseSchema {
-    allOf?: [Schema];
+    allOf?: Schema[];
     additionalProperties?: boolean;
     properties?: {[propertyName: string]: Schema};
     discriminator?: string;
@@ -153,7 +153,7 @@ declare module 'Swagger' {
     xml?: XML;
     externalDocs?: ExternalDocs;
     example?: {[exampleName: string]: Example};
-    required?: [string];
+    required?: string[];
   }
 
   export interface XML {
