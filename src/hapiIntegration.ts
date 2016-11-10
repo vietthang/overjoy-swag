@@ -24,19 +24,19 @@ interface HapiValidateParms {
 function makeHapiValidate(params: ValidateParams): HapiValidateParms {
   return {
 
-    query(value, options, next) {
+    query(value: any, options: any, next: any) {
       validate(params.query, value, next);
     },
 
-    params(value, options, next) {
+    params(value: any, options: any, next: any) {
       validate(params.params, value, next);
     },
 
-    headers(value, options, next) {
+    headers(value: any, options: any, next: any) {
       validate(params.headers, value, next);
     },
 
-    payload(value, options, next) {
+    payload(value: any, options: any, next: any) {
       validate(params.payload, value, next);
     },
 
@@ -58,7 +58,7 @@ function makeHapiValidate(params: ValidateParams): HapiValidateParms {
 
 function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConfiguration {
   const id = route.id;
-  let handler;
+  let handler: any;
   if (id) {
     handler = handlers[id];
   } else {
@@ -96,7 +96,7 @@ function transformHandler(transform: string | Function | undefined, handler: any
   }
 
   if (typeof transform === 'string') {
-    return transformHandler(handler, handler => ({ [transform]: handler }));
+    return transformHandler(handler, (handler: any) => ({ [transform]: handler }));
   }
 
   if (typeof transform === 'function') {
