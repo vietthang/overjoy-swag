@@ -42,4 +42,10 @@ export interface Route {
 
   readonly validate: ValidateParams;
 
+  readonly description?: string;
+
+  readonly tags?: string[];
+
+  readonly id?: string;
+
 }

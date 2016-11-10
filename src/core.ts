@@ -129,6 +129,9 @@ export async function loadRoutes(schema: any): Promise<Route[]> {
         consumes: operation.consumes || spec.consumes || [],
         produces: operation.produces || spec.produces || [],
         validate: operationToValidateParams(operation),
+        description: operation.description,
+        tags: operation.tags,
+        id: operation.operationId,
       }),
       pathMethodOperations,
     );
