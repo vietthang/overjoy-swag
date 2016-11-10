@@ -2,9 +2,12 @@
   "name": "overjoy-swag",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "tsc",
+    "bundle": "dts-bundle --name overjoy-swag --main build/index.d.ts",
+    "build": "npm run compile && npm run bundle",
+    "prepublish": "npm run build"
   },
   "author": "Yoshi",
   "license": "MIT",
@@ -23,7 +26,7 @@
     "ajv": "^4.8.2",
     "boom": "^4.2.0",
     "ramda": "^0.22.1",
-    "swagger-parser": "^3.4.1",
-    "swagger.d.ts": "^0.1.0"
-  }
+    "swagger-parser": "^3.4.1"
+  },
+  "typings": "build/overjoy-swag.d.ts"
 }
