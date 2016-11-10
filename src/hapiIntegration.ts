@@ -1,4 +1,4 @@
-import { curry, mapObjIndexed } from 'ramda';
+import { curry, mapObjIndexed, merge } from 'ramda';
 import { Server, IReply, Request, IRouteConfiguration, IJoi, IValidationFunction, IRouteFailFunction } from 'hapi';
 import Boom = require('boom');
 import { Route, ValidateParams } from './types';
@@ -116,20 +116,31 @@ export interface Options {
 
 }
 
-export async function register(server: any, { schema, handlers, handlerTransform }: Options, next: CallbackFunction) {
-  try {
-    const $server: Server = server;
-
-    const routes = await loadRoutes(schema);
-
-    const transformedHandlers = mapObjIndexed(curry(transformHandler)(handlerTransform), handlers);
-
-    const hapiRoutes = routes.map(curry(makeHapiRoute)(transformedHandlers));
-
-    $server.route(hapiRoutes);
-
-    next();
-  } catch (e) {
-    next(e);
-  }
+export interface RegisterFunction {
+  (server: Server, options: Options, next: CallbackFunction): Promise<void>;
+  attributes: Object;
 }
+
+export const register: RegisterFunction = merge(
+  async (server: Server, { schema, handlers, handlerTransform }: Options, next: CallbackFunction) => {
+      try {
+      const routes = await loadRoutes(schema);
+
+      const transformedHandlers = mapObjIndexed(curry(transformHandler)(handlerTransform), handlers);
+
+      const hapiRoutes = routes.map(curry(makeHapiRoute)(transformedHandlers));
+
+      server.route(hapiRoutes);
+
+      next();
+    } catch (e) {
+      next(e);
+    }
+  },
+  {
+    attributes: {
+      name: 'overjoy-swag',
+      version: '1.0.5',
+    },
+  },
+);
