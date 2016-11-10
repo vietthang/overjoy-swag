@@ -5,8 +5,8 @@
   },
   "globalDependencies": {
     "boom": "registry:dt/boom#0.0.0+20160724101333",
-    "knex": "registry:dt/knex#0.0.0+20160923124117",
-    "source-map-support": "registry:dt/source-map-support#0.2.10+20160316155526"
+    "hapi": "registry:dt/hapi#13.0.0+20161019130714",
+    "knex": "registry:dt/knex#0.0.0+20160923124117"
   },
   "globalDevDependencies": {
     "bluebird": "registry:dt/bluebird#3.0.0+20160928162057",
