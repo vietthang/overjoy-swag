@@ -1,10 +1,8 @@
 declare module 'swagger-parser' {
 
-  import { Spec as SwaggerSpec } from 'Swagger';
-
   class SwaggerParser {
 
-    validate(api: any): Promise<SwaggerSpec>;
+    validate(api: any): Promise<any>;
 
   }
 

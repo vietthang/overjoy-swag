@@ -1,4 +1,4 @@
-import { Schema } from 'Swagger';
+import { Schema } from './swagger';
 import Ajv = require('ajv');
 import { ErrorObject } from 'ajv';
 import { memoize } from 'ramda';

@@ -1,4 +1,4 @@
-import { Schema } from 'Swagger';
+import { Schema } from './swagger';
 
 export type MethodType = 'get'|'post'|'put'|'delete'|'options'|'head'|'patch';
 

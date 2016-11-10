@@ -1,6 +1,6 @@
 import { map, keys, filter, isNil, find, reduce, assocPath, assoc, mapObjIndexed, chain, has, omit } from 'ramda';
 import swaggerParser = require('swagger-parser');
-import * as Swagger from 'Swagger';
+import * as Swagger from './swagger';
 import { MethodType, Response, ResponseHash, Route, ValidateParams } from './types';
 
 const supportedMethods: MethodType[] = ['get', 'post', 'put', 'delete', 'options', 'head', 'patch'];
@@ -108,7 +108,7 @@ function operationToValidateParams(operation: Swagger.Operation): ValidateParams
 }
 
 export async function loadRoutes(schema: any): Promise<Route[]> {
-  const spec = await swaggerParser.validate(schema);
+  const spec: Swagger.Spec = await swaggerParser.validate(schema);
   const pathNames = keys(spec.paths);
   const pathConfigPairs = map(pathUri => ({ pathUri, pathConfig: spec.paths[pathUri] }), pathNames);
   const routes = chain(({ pathUri, pathConfig }) => {
