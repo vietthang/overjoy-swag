@@ -28,7 +28,7 @@ class UnknownError extends Error {
 
 }
 
-export type ValidateCallback = (error?: Error) => void;
+export type ValidateCallback = (error: Error | null, output?: any) => void;
 
 export function validate(schema: Schema, attributes: any, callback: ValidateCallback): void {
   const validate = getValidateFunction(schema);
@@ -40,6 +40,6 @@ export function validate(schema: Schema, attributes: any, callback: ValidateCall
       callback(new UnknownError());
     }
   } else {
-    callback();
+    callback(null, attributes);
   }
 }
