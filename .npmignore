@@ -1,4 +1,3 @@
 *
 !.npmignore
-!build
-!overjoy-await.d.ts
+!build/**/*
