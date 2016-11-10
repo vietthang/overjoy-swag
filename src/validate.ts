@@ -9,7 +9,7 @@ const getValidateFunction = memoize((schema: Schema) => {
   return ajv.compile(schema);
 });
 
-class ValidationError extends Error {
+export class ValidationError extends Error {
 
   public errors: ErrorObject[];
 
@@ -28,14 +28,18 @@ class UnknownError extends Error {
 
 }
 
-export async function validate(schema: Schema, attributes: any): Promise<void> {
+export type ValidateCallback = (error?: Error) => void;
+
+export function validate(schema: Schema, attributes: any, callback: ValidateCallback): void {
   const validate = getValidateFunction(schema);
   const result = validate(attributes);
   if (!result) {
     if (validate.errors) {
-      throw new ValidationError(validate.errors);
+      callback(new ValidationError(validate.errors));
     } else {
-      throw new UnknownError();
+      callback(new UnknownError());
     }
+  } else {
+    callback();
   }
 }
