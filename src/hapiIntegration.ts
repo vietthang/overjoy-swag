@@ -1,4 +1,4 @@
-import { curry, mapObjIndexed, merge } from 'ramda';
+import { curry, mapObjIndexed } from 'ramda';
 import { Server, IReply, Request, IRouteConfiguration, IJoi, IValidationFunction, IRouteFailFunction } from 'hapi';
 import Boom = require('boom');
 import { Route, ValidateParams } from './types';
@@ -119,6 +119,11 @@ export interface Options {
 export interface RegisterFunction {
   (server: Server, options: Options, next: CallbackFunction): Promise<void>;
   attributes: Object;
+}
+
+function merge<T1, T2>(onto: T1, from: T2): T1 & T2 {
+  Object.keys(from).forEach(key => onto[key] = from[key]);
+  return onto as T1 & T2;
 }
 
 export const register: RegisterFunction = merge(
