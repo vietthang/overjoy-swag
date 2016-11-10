@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "ajv": "^4.8.2",
+    "boom": "^4.2.0",
     "ramda": "^0.22.1",
     "swagger-parser": "^3.4.1",
     "swagger.d.ts": "^0.1.0"

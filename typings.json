@@ -4,6 +4,7 @@
     "ramda": "registry:dt/ramda#0.0.0+20160824142652"
   },
   "globalDependencies": {
+    "boom": "registry:dt/boom#0.0.0+20160724101333",
     "knex": "registry:dt/knex#0.0.0+20160923124117"
   },
   "globalDevDependencies": {
