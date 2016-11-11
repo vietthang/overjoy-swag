@@ -13,6 +13,10 @@ ajv.addFormat('number', (value) => {
   return !Number.isNaN(+value);
 });
 
+ajv.addFormat('int32', (value) => Number.isInteger(+value));
+
+ajv.addFormat('int64', (value) => Number.isInteger(+value));
+
 const getValidateFunction = memoize((schema: Schema) => {
   return ajv.compile(schema);
 });
