@@ -38,9 +38,13 @@ export interface Header extends BaseSchema {
 }
 
 // ----------------------------- Parameter -----------------------------------
+export type ParameterLocationForm = 'query' | 'path' | 'formData' | 'header';
+
+export type ParameterLocation = ParameterLocationForm | 'body';
+
 export interface BaseParameter {
   name: string;
-  in: string;
+  in: ParameterLocation;
   required?: boolean;
   description?: string;
 }

@@ -9,26 +9,27 @@ const anyType: Swagger.SchemaType = ['string', 'boolean', 'number', 'integer', '
 
 function createSchema(
   parameters: Swagger.Parameter[],
-  type: string,
+  type: Swagger.ParameterLocationForm,
   additionalProperties: boolean,
 ): Swagger.Schema | undefined {
   const filteredParams = map(
     param => param as Swagger.NonBodyParameter,
     filter(
-      param => param.in === type, parameters
+      param => param.in === type,
+      parameters,
     ),
   );
 
   const requiredParams = filter(param => param.required === true, filteredParams);
 
-  const baseSchema: Swagger.Schema = {
-    type: 'object',
-    additionalProperties,
-    properties: {},
-    required: requiredParams.length ? map(param => param.name, requiredParams) : undefined,
-  };
-
   if (filteredParams.length) {
+    const baseSchema: Swagger.Schema = {
+      type: 'object',
+      additionalProperties,
+      properties: {},
+      required: requiredParams.length ? map(param => param.name, requiredParams) : undefined,
+    };
+
     return reduce(
       (prevValue, param) => {
         const schema: Swagger.BaseSchema = omit(['in', 'name', 'required'], param);
