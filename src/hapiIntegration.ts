@@ -1,6 +1,7 @@
 import { curry, mapObjIndexed } from 'ramda';
 import { Server, IReply, Request, IRouteConfiguration, IJoi, IValidationFunction, IRouteFailFunction } from 'hapi';
 import Boom = require('boom');
+import { Schema } from './swagger';
 import { Route, ValidateParams } from './types';
 import { loadRoutes } from './core';
 import { validate, ValidationError } from './validate';
@@ -21,39 +22,45 @@ interface HapiValidateParms {
 	options?: any;
 }
 
+function failAction(request: Request, reply: IReply, source: string, boomError: any) {
+  const error: Error = boomError.data;
+
+  request.server.log(['error', 'validation'], error);
+
+  if (error instanceof ValidationError) {
+    boomError.output.payload.validation = {
+      errors: error.errors,
+      source,
+    };
+  } else {
+    boomError.output.payload.validation = {
+      source,
+    };
+  }
+
+  reply(boomError);
+}
+
 function makeHapiValidate(params: ValidateParams): HapiValidateParms {
-  return {
+  const hapiParams = { failAction } as HapiValidateParms;
 
-    query(value: any, options: any, next: any) {
-      validate(params.query, value, next);
-    },
+  if (params.query !== undefined) {
+    hapiParams.query = (value: any, options: any, next: any) => validate(params.query as Schema, value, next);
+  }
 
-    params(value: any, options: any, next: any) {
-      validate(params.params, value, next);
-    },
+  if (params.params !== undefined) {
+    hapiParams.params = (value: any, options: any, next: any) => validate(params.params as Schema, value, next);
+  }
 
-    headers(value: any, options: any, next: any) {
-      validate(params.headers, value, next);
-    },
+  if (params.headers !== undefined) {
+    hapiParams.headers = (value: any, options: any, next: any) => validate(params.headers as Schema, value, next);
+  }
 
-    payload(value: any, options: any, next: any) {
-      validate(params.payload, value, next);
-    },
+  if (params.payload !== undefined) {
+    hapiParams.payload = (value: any, options: any, next: any) => validate(params.payload as Schema, value, next);
+  }
 
-    failAction(request: Request, reply: IReply, source: string, error: any) {
-      request.server.log(['error', 'validation'], error);
-
-      if (error instanceof ValidationError) {
-        reply({
-          source,
-          errors: error.errors,
-        }).code(400);
-      } else {
-        reply(Boom.badImplementation());
-      }
-    },
-
-  };
+  return hapiParams;
 }
 
 function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConfiguration {
@@ -127,7 +134,7 @@ function merge<T1, T2>(onto: T1, from: T2): T1 & T2 {
 }
 
 export const register: RegisterFunction = merge(
-  async (server: Server, { schema, handlers, handlerTransform }: Options, next: CallbackFunction) => {
+  async (server: Server, { schema, handlers = [], handlerTransform }: Options, next: CallbackFunction) => {
       try {
       const routes = await loadRoutes(schema);
 

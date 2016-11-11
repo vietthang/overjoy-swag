@@ -18,13 +18,13 @@ export interface ResponseHash {
 
 export interface ValidateParams {
 
-  readonly params: Schema;
+  readonly params?: Schema;
 
-  readonly query: Schema;
+  readonly query?: Schema;
 
-  readonly headers: Schema;
+  readonly headers?: Schema;
 
-  readonly payload: Schema;
+  readonly payload?: Schema;
 
   readonly responses: ResponseHash;
 

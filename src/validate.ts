@@ -5,6 +5,14 @@ import { memoize } from 'ramda';
 
 const ajv = new Ajv();
 
+ajv.addFormat('integer', (value) => {
+  return Number.isInteger(+value);
+});
+
+ajv.addFormat('number', (value) => {
+  return !Number.isNaN(+value);
+});
+
 const getValidateFunction = memoize((schema: Schema) => {
   return ajv.compile(schema);
 });

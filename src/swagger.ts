@@ -49,35 +49,17 @@ export interface BodyParameter extends BaseParameter {
   schema: Schema;
 }
 
-export interface QueryParameter extends BaseParameter, BaseSchema {
+export interface NonBodyParameter extends BaseParameter, BaseSchema {
   type: SchemaType;
   collectionFormat?: ParameterCollectionFormat;
   allowEmptyValue?: boolean;
-}
-
-export interface PathParameter extends BaseParameter, BaseSchema {
-  type: SchemaType;
-  required: boolean;
-}
-
-export interface HeaderParameter extends BaseParameter, BaseSchema {
-  type: SchemaType;
 }
 
 export type ParameterCollectionFormat = 'csv' | 'ssv' | 'tsv' | 'pipes' | 'multi';
 
-export interface FormDataParameter extends BaseParameter, BaseSchema {
-  type: SchemaType;
-  collectionFormat?: ParameterCollectionFormat;
-  allowEmptyValue?: boolean;
-}
-
 export type Parameter =
   BodyParameter |
-  FormDataParameter |
-  QueryParameter |
-  PathParameter |
-  HeaderParameter;
+  NonBodyParameter;
 
 // ------------------------------- Path --------------------------------------
 export interface Path {
@@ -225,7 +207,7 @@ export interface Spec {
   produces?: string[];
   paths: {[pathName: string]: Path};
   definitions?: {[definitionsName: string]: Schema };
-  parameters?: {[parameterName: string]: BodyParameter|QueryParameter};
+  parameters?: {[parameterName: string]: Parameter};
   responses?: {[responseName: string]: Response };
   security?: Security[];
   securityDefinitions?: { [securityDefinitionName: string]: Security};
