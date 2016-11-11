@@ -4,11 +4,10 @@ import { Server, Request, IReply } from 'hapi';
 import { merge, omit } from 'ramda';
 import qs = require('querystring');
 import Boom = require('boom');
+import fs = require('fs');
 
 import { assert } from './common/assert';
 import * as apiLoader from '../src/index';
-// import api from '../data/swagger/petstore-expanded.json';
-import fs = require('fs');
 
 const api = JSON.parse(fs.readFileSync('./test/data/swagger/petstore-expanded.json', 'utf8'));
 
@@ -189,67 +188,67 @@ describe('Test Swagger Loader module with Swagger pet store sample', () => {
     });
   });
   //
-  // describe('Get pet by ID', () => {
-  //   it('Should reject if id is not a number', async () => {
-  //     const response = await server.inject({
-  //       method: 'GET',
-  //       url: '/api/pets/ok',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //
-  //     assert.equal(response.statusCode, 400)
-  //   })
-  //
-  //   it('Should success if id is a non-existing number', async () => {
-  //     const response = await server.inject({
-  //       method: 'GET',
-  //       url: '/api/pets/1',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //
-  //     assert.equal(response.statusCode, 404)
-  //   })
-  //
-  //   it('Should success if id is an existing number', async () => {
-  //     const response = await server.inject({
-  //       method: 'GET',
-  //       url: '/api/pets/2',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //
-  //     assert.equal(response.statusCode, 200)
-  //   })
-  // })
-  //
-  // describe('Delete pet', () => {
-  //   it('Should reject if id is not a number', async () => {
-  //     const response = await server.inject({
-  //       method: 'DELETE',
-  //       url: '/api/pets/ok',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //
-  //     assert.equal(response.statusCode, 400)
-  //   })
-  //
-  //   it('Should reject because the route is not implemented', async () => {
-  //     const response = await server.inject({
-  //       method: 'DELETE',
-  //       url: '/api/pets/1',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     })
-  //
-  //     assert.equal(response.statusCode, 501)
-  //   })
-// });
+  describe('Get pet by ID', () => {
+    it('Should reject if id is not a number', async () => {
+      const response = await server.inject({
+        method: 'GET',
+        url: '/api/pets/ok',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      assert.equal(response.statusCode, 400);
+    });
+
+    it('Should success if id is a non-existing number', async () => {
+      const response = await server.inject({
+        method: 'GET',
+        url: '/api/pets/1',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      assert.equal(response.statusCode, 404);
+    });
+
+    it('Should success if id is an existing number', async () => {
+      const response = await server.inject({
+        method: 'GET',
+        url: '/api/pets/2',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      assert.equal(response.statusCode, 200);
+    });
+  });
+
+  describe('Delete pet', () => {
+    it('Should reject if id is not a number', async () => {
+      const response = await server.inject({
+        method: 'DELETE',
+        url: '/api/pets/ok',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      assert.equal(response.statusCode, 400);
+    });
+
+    it('Should reject because the route is not implemented', async () => {
+      const response = await server.inject({
+        method: 'DELETE',
+        url: '/api/pets/1',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      assert.equal(response.statusCode, 501);
+    });
+  });
 });
