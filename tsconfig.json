@@ -18,12 +18,10 @@
     "suppressImplicitAnyIndexErrors": true
   },
   "filesGlob": [
-    "./**/*.ts",
-    "!./node_modules/**/*.ts"
-  ],
-  "files": [
     "src/index.ts",
-    "include/index.d.ts"
+    "include/index.d.ts",
+    "test/**/*.spec.ts",
+    "!./node_modules/**/*.ts"
   ],
   "compileOnSave": false
 }
