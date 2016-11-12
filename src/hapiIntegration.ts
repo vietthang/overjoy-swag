@@ -1,10 +1,18 @@
-import { curry, mapObjIndexed } from 'ramda';
-import { Server, IReply, Request, IRouteConfiguration, IJoi, IValidationFunction, IRouteFailFunction } from 'hapi';
+import { curry, mapObjIndexed, merge, omit, keys } from 'ramda';
+import {
+  Server, IReply, Request, IRouteConfiguration, IJoi, IValidationFunction,
+  IRouteFailFunction, IRouteAdditionalConfigurationOptions,
+} from 'hapi';
 import Boom = require('boom');
 import { Schema } from './swagger';
-import { Route, ValidateParams } from './types';
+import { Route, ValidateParams, Response } from './types';
 import { loadRoutes } from './core';
 import { validate, ValidationError } from './validate';
+
+function mergeFn<T1, T2>(onto: T1, from: T2): T1 & T2 {
+  Object.keys(from).forEach(key => onto[key] = from[key]);
+  return onto as T1 & T2;
+}
 
 export type CallbackFunction = (error?: Error) => void;
 
@@ -63,6 +71,10 @@ function makeHapiValidate(params: ValidateParams): HapiValidateParms {
   return hapiParams;
 }
 
+function makeHapiResponseValidate(response: Response): IValidationFunction {
+  return (value: any, options: any, next: any) => validate(response.payload, value, next);
+}
+
 function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConfiguration {
   const id = route.id;
   let handler: any;
@@ -75,6 +87,55 @@ function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConf
     handler = notImplementedHandler;
   }
 
+  // console.log(mapObjIndexed(makeHapiResponseValidate, route.validate.responses))
+
+  let config: IRouteAdditionalConfigurationOptions = {
+
+    validate: makeHapiValidate(route.validate),
+
+  };
+
+  const shouldHasPayload = route.method !== 'get' && route.method !== 'head';
+
+  if (shouldHasPayload) {
+    const hasFile = false;
+
+    config = merge(config, {
+      payload: {
+        allow: route.consumes,
+        parse: true,
+        maxBytes: 1024 * 1024 * 32,
+        output: hasFile ? 'stream' : 'data',
+      },
+    });
+  }
+
+  if (route.validate.responses.default) {
+    config = merge(config, {
+
+      response: {
+
+        schema: makeHapiResponseValidate(route.validate.responses.default),
+
+      },
+
+    });
+  }
+
+  const responsesWithoutDefault = omit(['default'], route.validate.responses);
+  const statuses = keys(responsesWithoutDefault);
+  if (statuses.length) {
+    config = merge(config, {
+
+      response: {
+
+        status: mapObjIndexed(makeHapiResponseValidate, responsesWithoutDefault),
+
+      },
+
+    });
+  }
+
   return {
 
     method: route.method,
@@ -83,11 +144,7 @@ function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConf
 
     handler,
 
-    config: {
-
-      validate: makeHapiValidate(route.validate),
-
-    },
+    config,
 
   };
 
@@ -128,12 +185,7 @@ export interface RegisterFunction {
   attributes: Object;
 }
 
-function merge<T1, T2>(onto: T1, from: T2): T1 & T2 {
-  Object.keys(from).forEach(key => onto[key] = from[key]);
-  return onto as T1 & T2;
-}
-
-export const register: RegisterFunction = merge(
+export const register: RegisterFunction = mergeFn(
   async (server: Server, { schema, handlers = [], handlerTransform }: Options, next: CallbackFunction) => {
       try {
       const routes = await loadRoutes(schema);

@@ -12,7 +12,9 @@ export interface Response {
 
 export interface ResponseHash {
 
-  readonly [status: string]: Response;
+  readonly [status: number]: Response;
+
+  readonly default?: Response;
 
 }
 
