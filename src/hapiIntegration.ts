@@ -58,22 +58,16 @@ function responseFailAction(request: Request, reply: IReply, error: any) {
   reply(Boom.badImplementation(error.message));
 }
 
-function makeHapiValidate(params: ValidateParams): HapiValidateParms {
+function makeHapiValidate(params: ValidateParams, hasPayload: boolean): HapiValidateParms {
   const hapiParams = { failAction: requestFailAction } as HapiValidateParms;
 
-  if (params.query !== undefined) {
-    hapiParams.query = (value: any, options: any, next: any) => validate(params.query as Schema, value, next);
-  }
+  hapiParams.query = (value: any, options: any, next: any) => validate(params.query as Schema, value, next);
 
-  if (params.params !== undefined) {
-    hapiParams.params = (value: any, options: any, next: any) => validate(params.params as Schema, value, next);
-  }
+  hapiParams.params = (value: any, options: any, next: any) => validate(params.params as Schema, value, next);
 
-  if (params.headers !== undefined) {
-    hapiParams.headers = (value: any, options: any, next: any) => validate(params.headers as Schema, value, next);
-  }
+  hapiParams.headers = (value: any, options: any, next: any) => validate(params.headers as Schema, value, next);
 
-  if (params.payload !== undefined) {
+  if (hasPayload) {
     hapiParams.payload = (value: any, options: any, next: any) => validate(params.payload as Schema, value, next);
   }
 
@@ -96,15 +90,15 @@ function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConf
     handler = notImplementedHandler;
   }
 
+  const hasPayload = route.method !== 'get' && route.method !== 'head';
+
   let config: IRouteAdditionalConfigurationOptions = {
 
-    validate: makeHapiValidate(route.validate),
+    validate: makeHapiValidate(route.validate, hasPayload),
 
   };
 
-  const shouldHasPayload = route.method !== 'get' && route.method !== 'head';
-
-  if (shouldHasPayload) {
+  if (hasPayload) {
     const hasFile = false;
 
     config = merge(config, {
