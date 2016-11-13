@@ -18,10 +18,13 @@ const getValidateFunction = memoize((schema: Schema) => {
 
 export class ValidationError extends Error {
 
-  public errors: ErrorObject[];
+  public readonly errors: ErrorObject[];
 
-  constructor(errors: ErrorObject[]) {
+  public readonly source: any;
+
+  constructor(source: any, errors: ErrorObject[]) {
     super('Validation Error');
+    this.source = source;
     this.errors = errors;
   }
 
@@ -43,7 +46,7 @@ export function validate(schema: Schema, attributes: any, callback: ValidateCall
   const result = validate(clonedAttributes);
   if (!result) {
     if (validate.errors) {
-      callback(new ValidationError(validate.errors));
+      callback(new ValidationError(clonedAttributes, validate.errors));
     } else {
       callback(new UnknownError());
     }
