@@ -52,6 +52,8 @@ function requestFailAction(request: Request, reply: IReply, source: string, boom
 function responseFailAction(request: Request, reply: IReply, error: any) {
   if (error instanceof ValidationError) {
     request.log('validation', error.errors);
+  } else {
+    request.log('unknown-error', error);
   }
   reply(Boom.badImplementation(error.message));
 }
