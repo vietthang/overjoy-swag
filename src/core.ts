@@ -1,17 +1,27 @@
-import { map, keys, filter, isNil, find, reduce, assocPath, mapObjIndexed, chain, has, omit } from 'ramda';
+import { map, keys, filter, isNil, find, reduce, assocPath, mapObjIndexed, chain, has, omit, merge } from 'ramda';
 import swaggerParser = require('swagger-parser');
 import * as Swagger from './swagger';
 import { MethodType, Response, ResponseHash, Route, ValidateParams } from './types';
 
 const supportedMethods: MethodType[] = ['get', 'post', 'put', 'delete', 'options', 'head', 'patch'];
 
-const anyType: Swagger.SchemaType = ['string', 'boolean', 'number', 'integer', 'object', 'array', 'file'];
+const defaultResponse: Response = {
+
+  payload: {},
+
+  headers: {},
+
+}
+
+function generateRandomString(): string {
+  return Math.random().toString(36).substr(2);
+}
 
 function createSchema(
   parameters: Swagger.Parameter[],
   type: Swagger.ParameterLocationForm,
   additionalProperties: boolean,
-): Swagger.Schema | undefined {
+): Swagger.Schema {
   const filteredParams = map(
     param => param as Swagger.NonBodyParameter,
     filter(
@@ -35,7 +45,6 @@ function createSchema(
         const schema: Swagger.BaseSchema = omit(['in', 'name', 'required'], param);
         const propertiesPath = ['properties', param.name];
 
-
         return assocPath(
           propertiesPath,
           schema,
@@ -46,11 +55,11 @@ function createSchema(
       filteredParams,
     );
   } else {
-    return undefined;
+    return {};
   }
 }
 
-function createPayloadValidateSchema(parameters: Swagger.Parameter[]): Swagger.Schema | undefined {
+function createPayloadValidateSchema(parameters: Swagger.Parameter[]): Swagger.Schema {
   const bodyParameter = find(param => param.in === 'body', parameters) as Swagger.BodyParameter;
   if (isNil(bodyParameter)) {
     return createSchema(parameters, 'formData', false);
@@ -65,10 +74,7 @@ function swaggerResponseToAPIResponse(response: Swagger.Response): Response {
   if (response.schema) {
     payloadSchema = response.schema;
   } else {
-    payloadSchema = {
-      type: anyType,
-      additionalProperties: true,
-    };
+    payloadSchema = {};
   }
 
   let headersSchema: Swagger.Schema;
@@ -99,12 +105,15 @@ function operationToValidateParams(method: MethodType, operation: Swagger.Operat
   const headers = createSchema(parameters, 'header', true);
   const payload = createPayloadValidateSchema(parameters);
 
-  let responses: ResponseHash = {};
+  let responses: ResponseHash = { default: defaultResponse };
 
   if (!isNil(operation.responses)) {
-    responses = mapObjIndexed(
-      (entry: Swagger.Response) => swaggerResponseToAPIResponse(entry),
-      operation.responses,
+    responses = merge(
+      responses,
+      mapObjIndexed(
+        (entry: Swagger.Response) => swaggerResponseToAPIResponse(entry),
+        operation.responses,
+      ),
     );
   }
 
@@ -139,9 +148,9 @@ export async function loadRoutes(schema: any): Promise<Route[]> {
         consumes: operation.consumes || spec.consumes || [],
         produces: operation.produces || spec.produces || [],
         validate: operationToValidateParams(method, operation),
-        description: operation.description,
-        tags: operation.tags,
-        id: operation.operationId,
+        description: operation.description || '',
+        tags: operation.tags || [],
+        id: operation.operationId || `operation_${generateRandomString()}`,
       }),
       pathMethodOperations,
     );

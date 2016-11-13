@@ -14,19 +14,19 @@ export interface ResponseHash {
 
   readonly [status: number]: Response;
 
-  readonly default?: Response;
+  readonly default: Response;
 
 }
 
 export interface ValidateParams {
 
-  readonly params?: Schema;
+  readonly params: Schema;
 
-  readonly query?: Schema;
+  readonly query: Schema;
 
-  readonly headers?: Schema;
+  readonly headers: Schema;
 
-  readonly payload?: Schema;
+  readonly payload: Schema;
 
   readonly responses: ResponseHash;
 
@@ -44,10 +44,10 @@ export interface Route {
 
   readonly validate: ValidateParams;
 
-  readonly description?: string;
+  readonly description: string;
 
-  readonly tags?: string[];
+  readonly tags: string[];
 
-  readonly id?: string;
+  readonly id: string;
 
 }
