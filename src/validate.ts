@@ -1,16 +1,11 @@
 import { Schema } from './swagger';
 import Ajv = require('ajv');
 import { ErrorObject } from 'ajv';
-import { memoize } from 'ramda';
+import { memoize, clone } from 'ramda';
 
-const ajv = new Ajv();
-
-ajv.addFormat('integer', (value) => {
-  return Number.isInteger(+value);
-});
-
-ajv.addFormat('number', (value) => {
-  return !Number.isNaN(+value);
+const ajv = new Ajv({
+  useDefaults: true,
+  coerceTypes: 'array',
 });
 
 ajv.addFormat('int32', (value) => Number.isInteger(+value));
@@ -43,8 +38,9 @@ class UnknownError extends Error {
 export type ValidateCallback = (error: Error | null, output?: any) => void;
 
 export function validate(schema: Schema, attributes: any, callback: ValidateCallback): void {
+  const clonedAttributes = clone(attributes);
   const validate = getValidateFunction(schema);
-  const result = validate(attributes);
+  const result = validate(clonedAttributes);
   if (!result) {
     if (validate.errors) {
       callback(new ValidationError(validate.errors));
@@ -52,6 +48,6 @@ export function validate(schema: Schema, attributes: any, callback: ValidateCall
       callback(new UnknownError());
     }
   } else {
-    callback(null, attributes);
+    callback(null, clonedAttributes);
   }
 }

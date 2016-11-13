@@ -1,4 +1,4 @@
-import { map, keys, filter, isNil, find, reduce, assocPath, mapObjIndexed, chain, has, omit, merge } from 'ramda';
+import { map, keys, filter, isNil, find, reduce, assocPath, mapObjIndexed, chain, has, omit } from 'ramda';
 import swaggerParser = require('swagger-parser');
 import * as Swagger from './swagger';
 import { MethodType, Response, ResponseHash, Route, ValidateParams } from './types';
@@ -35,41 +35,6 @@ function createSchema(
         const schema: Swagger.BaseSchema = omit(['in', 'name', 'required'], param);
         const propertiesPath = ['properties', param.name];
 
-        if (param.type === 'number') {
-          return assocPath(
-            propertiesPath,
-            {
-              anyOf: [
-                schema,
-                merge(schema, { type: 'string', format: 'number' }),
-              ]
-            },
-            prevValue,
-          );
-        }
-
-        if (param.type === 'integer') {
-          return assocPath(
-            propertiesPath,
-            {
-              anyOf: [
-                schema,
-                merge(schema, { type: 'string', format: 'integer' }),
-              ]
-            },
-            prevValue,
-          );
-        }
-
-        if (param.type === 'array') {
-          return assocPath(
-            propertiesPath,
-            {
-              anyOf: [schema].concat(schema.items || []),
-            },
-            prevValue,
-          );
-        }
 
         return assocPath(
           propertiesPath,

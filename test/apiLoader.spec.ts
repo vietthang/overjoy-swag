@@ -16,7 +16,7 @@ const routes = {
   findPets(req: Request, reply: IReply) {
     const { limit } = req.query;
 
-    if (+limit === 1) {
+    if (limit === 1) {
       return reply({ name: 'abc' });
     } else {
       return reply([]);
