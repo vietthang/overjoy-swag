@@ -160,7 +160,7 @@ function transformHandler(transform: string | Function | undefined, handler: any
   }
 
   if (typeof transform === 'string') {
-    return transformHandler(handler, (handler: any) => ({ [transform]: handler }));
+    return transformHandler((handler: any) => ({ [transform]: handler }), handler);
   }
 
   if (typeof transform === 'function') {
@@ -187,7 +187,7 @@ export interface RegisterFunction {
 
 export const register: RegisterFunction = mergeFn(
   async (server: Server, { schema, handlers = [], handlerTransform }: Options, next: CallbackFunction) => {
-      try {
+    try {
       const routes = await loadRoutes(schema);
 
       const transformedHandlers = mapObjIndexed(curry(transformHandler)(handlerTransform), handlers);

@@ -48,7 +48,7 @@ const routes = {
 
 };
 
-const server = new Server();
+const server = new Server({ debug: false });
 
 server.connection({
   port: 0,
