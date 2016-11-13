@@ -30,7 +30,7 @@ interface HapiValidateParms {
 	options?: any;
 }
 
-function failAction(request: Request, reply: IReply, source: string, boomError: any) {
+function requestFailAction(request: Request, reply: IReply, source: string, boomError: any) {
   const error: Error = boomError.data;
 
   request.server.log(['error', 'validation'], error);
@@ -49,8 +49,15 @@ function failAction(request: Request, reply: IReply, source: string, boomError: 
   reply(boomError);
 }
 
+function responseFailAction(request: Request, reply: IReply, error: any) {
+  if (error instanceof ValidationError) {
+    request.log('validation', error.errors);
+  }
+  reply(Boom.badImplementation(error.message));
+}
+
 function makeHapiValidate(params: ValidateParams): HapiValidateParms {
-  const hapiParams = { failAction } as HapiValidateParms;
+  const hapiParams = { failAction: requestFailAction } as HapiValidateParms;
 
   if (params.query !== undefined) {
     hapiParams.query = (value: any, options: any, next: any) => validate(params.query as Schema, value, next);
@@ -87,8 +94,6 @@ function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConf
     handler = notImplementedHandler;
   }
 
-  // console.log(mapObjIndexed(makeHapiResponseValidate, route.validate.responses))
-
   let config: IRouteAdditionalConfigurationOptions = {
 
     validate: makeHapiValidate(route.validate),
@@ -110,14 +115,16 @@ function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConf
     });
   }
 
+  let response = {
+
+    failAction: responseFailAction,
+
+  };
+
   if (route.validate.responses.default) {
-    config = merge(config, {
+    response = merge(response, {
 
-      response: {
-
-        schema: makeHapiResponseValidate(route.validate.responses.default),
-
-      },
+      schema: makeHapiResponseValidate(route.validate.responses.default),
 
     });
   }
@@ -125,16 +132,14 @@ function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConf
   const responsesWithoutDefault = omit(['default'], route.validate.responses);
   const statuses = keys(responsesWithoutDefault);
   if (statuses.length) {
-    config = merge(config, {
+    response = merge(response, {
 
-      response: {
-
-        status: mapObjIndexed(makeHapiResponseValidate, responsesWithoutDefault),
-
-      },
+      status: mapObjIndexed(makeHapiResponseValidate, responsesWithoutDefault),
 
     });
   }
+
+  config = merge(config, { response });
 
   return {
 
