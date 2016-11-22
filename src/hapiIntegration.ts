@@ -179,6 +179,8 @@ export interface Options {
 
   handlerTransform: string | Function | undefined;
 
+  swaggerPath: string;
+
 }
 
 export interface RegisterFunction {
@@ -187,8 +189,10 @@ export interface RegisterFunction {
 }
 
 export const register: RegisterFunction = mergeFn(
-  async (server: Server, { schema, handlers = [], handlerTransform }: Options, next: CallbackFunction) => {
+  async (server: Server, options: Options, next: CallbackFunction) => {
     try {
+      const { schema, handlers = [], handlerTransform, swaggerPath = '/swagger.json' } = options;
+
       const routes = await loadRoutes(schema);
 
       const transformedHandlers = mapObjIndexed(curry(transformHandler)(handlerTransform), handlers);
@@ -196,6 +200,14 @@ export const register: RegisterFunction = mergeFn(
       const hapiRoutes = routes.map(curry(makeHapiRoute)(transformedHandlers));
 
       server.route(hapiRoutes);
+
+      server.route({
+        method: 'GET',
+        path: swaggerPath,
+        handler(req: Request, reply: IReply) {
+          reply(schema);
+        },
+      });
 
       next();
     } catch (e) {
