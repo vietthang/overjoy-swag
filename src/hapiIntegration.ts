@@ -113,6 +113,8 @@ function makeHapiRoute(handlers: {[key: string]: any}, route: Route): IRouteConf
 
   let response = {
 
+    modify: true,
+
     failAction: responseFailAction,
 
   };
