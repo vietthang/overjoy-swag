@@ -4,7 +4,9 @@ import {
   IRouteFailFunction, IRouteAdditionalConfigurationOptions,
 } from 'hapi';
 import Boom = require('boom');
-import { Schema } from './swagger';
+import swaggerParser = require('swagger-parser');
+
+import { Schema, Spec } from './swagger';
 import { Route, ValidateParams, Response } from './types';
 import { loadRoutes } from './core';
 import { validate, ValidationError } from './validate';
@@ -194,8 +196,9 @@ export const register: RegisterFunction = mergeFn(
   async (server: Server, options: Options, next: CallbackFunction) => {
     try {
       const { schema, handlers = [], handlerTransform, swaggerPath = '/swagger.json' } = options;
+      const spec: Spec = await swaggerParser.validate(schema);
 
-      const routes = await loadRoutes(schema);
+      const routes = await loadRoutes(spec);
 
       const transformedHandlers = mapObjIndexed(curry(transformHandler)(handlerTransform), handlers);
 
@@ -207,7 +210,7 @@ export const register: RegisterFunction = mergeFn(
         method: 'GET',
         path: swaggerPath,
         handler(req: Request, reply: IReply) {
-          reply(schema);
+          reply(spec);
         },
       });
 
